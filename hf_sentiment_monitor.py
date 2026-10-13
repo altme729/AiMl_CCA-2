@@ -1,7 +1,7 @@
 # ==============================================================================
 # Course: SY BCom FinTech | Subject: AI ML 1 - CCA2
-# Admin Name: [Shravan Sagale]
-# Admin PRN: [1302250620]
+# Admin Name: [Yukta Kulkarni]
+# Admin PRN: [1302250198]
 # File 3: Hugging Face Sentiment Monitor (Expanded Problem Statements)
 # ==============================================================================
 
