@@ -6,58 +6,49 @@
 # ==============================================================================
 
 # Simulated Vector Store / Knowledge Base
-KNOWLEDGE_BASE = {
-    "open banking": "Open banking allows third-party financial service providers open access to consumer banking, transaction, and other financial data through APIs.",
-    "cbdc": "Central Bank Digital Currency (CBDC) is a digital form of a country's sovereign currency issued and regulated by the monetary authority.",
-    "smart contract": "Smart contracts are self-executing contracts with terms of agreement directly written into code on a blockchain network."
-}
+class FinTechRAG:
+    def __init__(self):
+        # Updated rules focusing on tax, equity, and e-commerce
+        self.rules_database = {
+            "TAX_01": "Section 80C: Deductions on investments up to INR 1.5 Lakhs are allowed for specific mutual funds (ELSS).",
+            "TAX_02": "LTCG Equity: Long Term Capital Gains on equity mutual funds exceeding INR 1 Lakh are taxed at 10% without indexation.",
+            "GST_01": "E-Commerce: Handcrafted home decor items and concrete products typically attract a GST slab of 12% to 18% depending on the material.",
+            "CORP_01": "Corporate Finance: Startups registered under DPIIT can claim a tax holiday for 3 consecutive years."
+        }
+        
+    def retrieve_context(self, query):
+        """Find rules that match the keywords in the query."""
+        keywords = query.lower().split()
+        matched_rules = []
+        
+        for rule_id, rule_text in self.rules_database.items():
+            # If any keyword from the query is in the rule
+            if any(word in rule_text.lower() for word in keywords):
+                matched_rules.append(f"[{rule_id}] {rule_text}")
+                
+        return matched_rules
 
-def retrieve_context(query):
-    """Simulates Context Retrieval from database."""
-    query_clean = query.strip().lower()
-    return KNOWLEDGE_BASE.get(query_clean, None)
-
-def enforce_rag_rules_and_generate(query, retrieved_context):
-    """
-    Applies custom business and generation rules to simulate a RAG system.
-    """
-    print(f"\nIncoming User Query: '{query}'")
-    
-    # RULE 1: Verification Rule - Context Check
-    if not retrieved_context:
-        print("[Rule 1 Triggered]: Query context absent in Knowledge Base.")
-        return "I cannot answer this query based on verified internal database information."
-
-    print(f"[Retrieved Context]: {retrieved_context}")
-
-    # RULE 2: Length Constraint Rule (Limit response length)
-    words = retrieved_context.split()
-    if len(words) > 30:
-        retrieved_context = " ".join(words[:30]) + "..."
-        print("[Rule 2 Triggered]: Response context truncated to meet 30-word limit.")
-
-    # RULE 3: Compliance & Disclaimer Rule
-    disclaimer = "\n[Mandatory Rule 3 Notice]: This statement is generated for educational FinTech analysis only."
-
-    # RULE 4: Tone Enforcement Rule (Formal response wrapper)
-    final_output = f"Official Summary: {retrieved_context} {disclaimer}"
-    print("[Rule 4 Triggered]: Formatted output using formal compliance tone.")
-
-    return final_output
-
-def main():
-    test_queries = [
-        "Open Banking",
-        "CBDC",
-        "Generative AI in Finance"  # Intentionally missing query to test Rule 1
-    ]
-
-    print("--- Executing RAG Framework with Enforced Business Rules ---")
-    for q in test_queries:
-        context = retrieve_context(q)
-        response = enforce_rag_rules_and_generate(q, context)
-        print(f"Final Output:\n{response}")
-        print("-" * 60)
+    def generate_answer(self, query):
+        """Simulate the generation phase of RAG."""
+        print(f"User Query: '{query}'")
+        context = self.retrieve_context(query)
+        
+        if not context:
+            return "RAG Output: I could not find specific rules regarding this query in the database.\n"
+            
+        combined_context = "\n".join(context)
+        return (
+            f"RAG Output: Based on the retrieved financial rules, here is the context:\n"
+            f"{combined_context}\n"
+            f"Ensure your corporate filings comply with the above directives.\n"
+        )
 
 if __name__ == "__main__":
-    main()
+    bot = FinTechRAG()
+    
+    # Test queries
+    q1 = "What are the rules for equity mutual funds and LTCG?"
+    print(bot.generate_answer(q1))
+    
+    q2 = "Tell me about GST on handcrafted home decor."
+    print(bot.generate_answer(q2))
