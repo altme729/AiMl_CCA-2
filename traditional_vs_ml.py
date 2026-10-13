@@ -1,60 +1,56 @@
 # ==============================================================================
 # Course: SY BCom FinTech | Subject: AI ML 1 - CCA2
-# Admin Name: [Shravan Sagale]
-# Admin PRN: [1302250620]
+# Admin Name: [Yukta Kulkarni]
+# Admin PRN: [1302250198]
 # File 1: Traditional Programming Vs Machine Learning Programming Code
 # ==============================================================================
 
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 
-def main():
-    print("--- 1. Reading Input Data from Excel File ---")
-    excel_filename = "ml_input_data.xlsx"
+def traditional_fraud_check(file_path):
+    """Traditional logic using hardcoded thresholds."""
+    print("--- Traditional Rule-Based Fraud Detection ---")
+    df = pd.read_excel(file_path)
+    results = []
     
-    try:
-        df = pd.read_excel(excel_filename)
-        print("Dataset loaded successfully:")
-        print(df)
-    except FileNotFoundError:
-        print(f"Error: '{excel_filename}' not found! Ensure the file exists in the directory.")
-        return
-
-    # --------------------------------------------------------------------------
-    # APPROACH 1: Traditional Programming (Hardcoded Business Logic)
-    # --------------------------------------------------------------------------
-    def traditional_risk_classifier(credit_score, income_k):
-        # Explicit rule: High risk if credit score < 650 OR income < 45k
-        if credit_score < 650 or income_k < 45:
-            return "High Risk"
+    for index, row in df.iterrows():
+        # Rule: If transaction is > 50,000 AND is international AND has failed attempts
+        if row['Amount_INR'] > 50000 and row['Is_International'] == 1 and row['Failed_Attempts'] >= 2:
+            status = "Flagged: Fraud"
         else:
-            return "Low Risk"
+            status = "Clear"
+        results.append(f"Txn ID {row['Txn_ID']}: {status}")
+        
+    return results
 
-    # Apply traditional rules
-    df['Traditional_Prediction'] = df.apply(
-        lambda row: traditional_risk_classifier(row['Credit_Score'], row['Income_k']), axis=1
-    )
-
-    # --------------------------------------------------------------------------
-    # APPROACH 2: Machine Learning Programming (Model Training & Inference)
-    # --------------------------------------------------------------------------
-    # Features (Inputs) and Target (Output to Learn)
-    X = df[['Credit_Score', 'Income_k']]
-    y = df['Actual_Risk']
-
-    # Initialize Decision Tree Classifier and train on existing dataset
-    model = DecisionTreeClassifier(random_state=42)
-    model.fit(X, y)
-
-    # Predict using the trained model
-    df['ML_Prediction'] = model.predict(X)
-
-    # --------------------------------------------------------------------------
-    # DISPLAY RESULTS
-    # --------------------------------------------------------------------------
-    print("\n--- 2. Results Comparison ---")
-    comparison = df[['Customer_ID', 'Credit_Score', 'Income_k', 'Actual_Risk', 'Traditional_Prediction', 'ML_Prediction']]
-    print(comparison.to_string(index=False))
+def ml_fraud_check(file_path):
+    """Machine Learning logic using a Decision Tree Classifier."""
+    print("\n--- Machine Learning Fraud Detection ---")
+    df = pd.read_excel(file_path)
+    
+    # Features (X) and Target (y)
+    X = df[['Amount_INR', 'Is_International', 'Failed_Attempts']]
+    y = df['Is_Fraud']
+    
+    # Train Decision Tree Model
+    clf = DecisionTreeClassifier(random_state=42)
+    clf.fit(X, y)
+    
+    # Predict
+    predictions = clf.predict(X)
+    df['ML_Status'] = ["Flagged" if p == 1 else "Clear" for p in predictions]
+    
+    return df[['Txn_ID', 'ML_Status']]
 
 if __name__ == "__main__":
-    main()
+    input_file = "fraud_detection_inputs.xlsx"
+    
+    # Run Traditional
+    trad_out = traditional_fraud_check(input_file)
+    for res in trad_out:
+        print(res)
+        
+    # Run ML
+    ml_out = ml_fraud_check(input_file)
+    print("\nML Predictions:\n", ml_out.to_string(index=False))
