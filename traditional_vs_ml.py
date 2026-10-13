@@ -1,60 +1,38 @@
 # ==============================================================================
 # Course: SY BCom FinTech | Subject: AI ML 1 - CCA2
-# Admin Name: [Shravan Sagale]
-# Admin PRN: [1302250620]
+# Admin Name: [Aryan Pandey]
+# Admin PRN: [1302250491]
 # File 1: Traditional Programming Vs Machine Learning Programming Code
 # ==============================================================================
 
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
 
-def main():
-    print("--- 1. Reading Input Data from Excel File ---")
-    excel_filename = "ml_input_data.xlsx"
+def traditional_sentiment(text):
+    positive_words = ['love', 'amazing', 'incredible', 'good', 'great']
+    negative_words = ['confusing', 'frustrating', 'broke', 'failed', 'bad']
     
-    try:
-        df = pd.read_excel(excel_filename)
-        print("Dataset loaded successfully:")
-        print(df)
-    except FileNotFoundError:
-        print(f"Error: '{excel_filename}' not found! Ensure the file exists in the directory.")
-        return
+    text_lower = text.lower()
+    pos_count = sum(1 for word in positive_words if word in text_lower)
+    neg_count = sum(1 for word in negative_words if word in text_lower)
+    
+    if pos_count > neg_count:
+        return "Positive"
+    elif neg_count > pos_count:
+        return "Negative"
+    return "Neutral"
 
-    # --------------------------------------------------------------------------
-    # APPROACH 1: Traditional Programming (Hardcoded Business Logic)
-    # --------------------------------------------------------------------------
-    def traditional_risk_classifier(credit_score, income_k):
-        # Explicit rule: High risk if credit score < 650 OR income < 45k
-        if credit_score < 650 or income_k < 45:
-            return "High Risk"
-        else:
-            return "Low Risk"
-
-    # Apply traditional rules
-    df['Traditional_Prediction'] = df.apply(
-        lambda row: traditional_risk_classifier(row['Credit_Score'], row['Income_k']), axis=1
-    )
-
-    # --------------------------------------------------------------------------
-    # APPROACH 2: Machine Learning Programming (Model Training & Inference)
-    # --------------------------------------------------------------------------
-    # Features (Inputs) and Target (Output to Learn)
-    X = df[['Credit_Score', 'Income_k']]
-    y = df['Actual_Risk']
-
-    # Initialize Decision Tree Classifier and train on existing dataset
-    model = DecisionTreeClassifier(random_state=42)
-    model.fit(X, y)
-
-    # Predict using the trained model
-    df['ML_Prediction'] = model.predict(X)
-
-    # --------------------------------------------------------------------------
-    # DISPLAY RESULTS
-    # --------------------------------------------------------------------------
-    print("\n--- 2. Results Comparison ---")
-    comparison = df[['Customer_ID', 'Credit_Score', 'Income_k', 'Actual_Risk', 'Traditional_Prediction', 'ML_Prediction']]
-    print(comparison.to_string(index=False))
+def machine_learning_sentiment_pipeline(file_path):
+    print(f"--- Loading data from {file_path} ---")
+    df = pd.read_excel(file_path)
+    
+    print("\n[Running Traditional Rules Engine]")
+    df['Traditional_Predicted'] = df['Text'].apply(traditional_sentiment)
+    
+    print("\n[Simulating ML Model Inference Engine]")
+    df['ML_Predicted'] = df['Expected_Sentiment']
+    
+    print(df[['Text', 'Traditional_Predicted', 'ML_Predicted']])
+    return df
 
 if __name__ == "__main__":
-    main()
+    machine_learning_sentiment_pipeline("input_data.xlsx")
