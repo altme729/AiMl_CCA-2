@@ -1,60 +1,65 @@
 # ==============================================================================
 # Course: SY BCom FinTech | Subject: AI ML 1 - CCA2
-# Admin Name: [Shravan Sagale]
-# Admin PRN: [1302250620]
+# Admin Name: [Shlok Shirke]
+# Admin PRN: [1302250028]
 # File 1: Traditional Programming Vs Machine Learning Programming Code
 # ==============================================================================
-
+import openpyxl
+from sklearn.linear_model import LogisticRegression
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
 
-def main():
-    print("--- 1. Reading Input Data from Excel File ---")
-    excel_filename = "ml_input_data.xlsx"
-    
-    try:
-        df = pd.read_excel(excel_filename)
-        print("Dataset loaded successfully:")
-        print(df)
-    except FileNotFoundError:
-        print(f"Error: '{excel_filename}' not found! Ensure the file exists in the directory.")
-        return
 
-    # --------------------------------------------------------------------------
-    # APPROACH 1: Traditional Programming (Hardcoded Business Logic)
-    # --------------------------------------------------------------------------
-    def traditional_risk_classifier(credit_score, income_k):
-        # Explicit rule: High risk if credit score < 650 OR income < 45k
-        if credit_score < 650 or income_k < 45:
-            return "High Risk"
-        else:
-            return "Low Risk"
+def traditional_credit_assessment(file_path):
+  """Traditional Programming: Hardcoded rule-based logic to approve/reject loans."""
+  print("--- Running Traditional Rule-Based Programming ---")
+  wb = openpyxl.load_workbook(file_path)
+  sheet = wb.active
 
-    # Apply traditional rules
-    df['Traditional_Prediction'] = df.apply(
-        lambda row: traditional_risk_classifier(row['Credit_Score'], row['Income_k']), axis=1
+  results = []
+  for row in sheet.iter_rows(min_row=2, values_only=True):
+    name, credit_score, income, debt_ratio, default_status = row
+    # Hardcoded business rules
+    if credit_score >= 700 and income >= 50000 and debt_ratio < 0.4:
+      decision = "Approved"
+    else:
+      decision = "Rejected"
+    results.append(
+        f"Customer: {name} | Score: {credit_score} | Decision: {decision}"
     )
 
-    # --------------------------------------------------------------------------
-    # APPROACH 2: Machine Learning Programming (Model Training & Inference)
-    # --------------------------------------------------------------------------
-    # Features (Inputs) and Target (Output to Learn)
-    X = df[['Credit_Score', 'Income_k']]
-    y = df['Actual_Risk']
+  return results
 
-    # Initialize Decision Tree Classifier and train on existing dataset
-    model = DecisionTreeClassifier(random_state=42)
-    model.fit(X, y)
 
-    # Predict using the trained model
-    df['ML_Prediction'] = model.predict(X)
+def machine_learning_credit_assessment(file_path):
+  """Machine Learning Programming: Data-driven predictive modeling."""
+  print("\n--- Running Machine Learning Programming ---")
+  df = pd.read_excel(file_path)
 
-    # --------------------------------------------------------------------------
-    # DISPLAY RESULTS
-    # --------------------------------------------------------------------------
-    print("\n--- 2. Results Comparison ---")
-    comparison = df[['Customer_ID', 'Credit_Score', 'Income_k', 'Actual_Risk', 'Traditional_Prediction', 'ML_Prediction']]
-    print(comparison.to_string(index=False))
+  # Features and Target
+  X = df[["Credit_Score", "Annual_Income", "Debt_Ratio"]]
+  y = df["Default_Status"]  # 1 for safe, 0 for risky
+
+  # Train a simple Logistic Regression model
+  model = LogisticRegression()
+  model.fit(X, y)
+
+  predictions = model.predict(X)
+  df["ML_Prediction"] = [
+      "Approved" if p == 1 else "Rejected" for p in predictions
+  ]
+
+  return df[["Customer_Name", "ML_Prediction"]]
+
 
 if __name__ == "__main__":
-    main()
+  excel_file = "financial_ml_inputs.xlsx"
+
+  # Execute Traditional approach
+  trad_results = traditional_credit_assessment(excel_file)
+  for res in trad_results:
+    print(res)
+
+  # Execute ML approach
+  ml_results = machine_learning_credit_assessment(excel_file)
+  print("\nML Model Results:")
+  print(ml_results)

@@ -1,23 +1,25 @@
 # ==============================================================================
 # Course: SY BCom FinTech | Subject: AI ML 1 - CCA2
-# Admin Name: [Shravan Sagale]
-# Admin PRN: [1302250620]
+# Admin Name: [Shlok Shirke]
+# Admin PRN: [1302250028]
 # File 2: Generates 'ml_input_data.xlsx'
 # ==============================================================================
-
 import pandas as pd
 
-# Credit score and Income (in thousands) data for loan risk classification
-dataset = {
-    'Customer_ID': [101, 102, 103, 104, 105, 106, 107, 108],
-    'Credit_Score': [720, 580, 690, 610, 750, 540, 680, 800],
-    'Income_k': [65, 30, 50, 40, 90, 25, 48, 110],
-    'Actual_Risk': ['Low Risk', 'High Risk', 'Low Risk', 'High Risk', 'Low Risk', 'High Risk', 'Low Risk', 'Low Risk']
+data = {
+    "Customer_Name": [
+        "Aarav Sharma",
+        "Rohan Mehta",
+        "Priya Verma",
+        "Ananya Iyer",
+        "Vikram Patil",
+    ],
+    "Credit_Score": [720, 650, 780, 610, 810],
+    "Annual_Income": [60000, 45000, 90000, 38000, 120000],
+    "Debt_Ratio": [0.30, 0.55, 0.20, 0.60, 0.15],
+    "Default_Status": [1, 0, 1, 0, 1],  # 1 = Low Risk, 0 = High Risk
 }
 
-df = pd.DataFrame(dataset)
-
-# Save to Excel format
-output_filename = "ml_input_data.xlsx"
-df.to_excel(output_filename, index=False)
-print(f"File '{output_filename}' created successfully!")
+df = pd.DataFrame(data)
+df.to_excel("financial_ml_inputs.xlsx", index=False)
+print("Successfully generated 'financial_ml_inputs.xlsx' for ML and Traditional scripts.")
