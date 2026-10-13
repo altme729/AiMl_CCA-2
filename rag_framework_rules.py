@@ -1,63 +1,48 @@
 # ==============================================================================
 # Course: SY BCom FinTech | Subject: AI ML 1 - CCA2
-# Admin Name: [Shravan Sagale]
-# Admin PRN: [1302250620]
+# Admin Name: [Ayan Pandey]
+# Admin PRN: [1302250491]
 # File 4: RAG Framework (Retrieval-Augmented Generation) with Additional Rules
 # ==============================================================================
 
 # Simulated Vector Store / Knowledge Base
-KNOWLEDGE_BASE = {
-    "open banking": "Open banking allows third-party financial service providers open access to consumer banking, transaction, and other financial data through APIs.",
-    "cbdc": "Central Bank Digital Currency (CBDC) is a digital form of a country's sovereign currency issued and regulated by the monetary authority.",
-    "smart contract": "Smart contracts are self-executing contracts with terms of agreement directly written into code on a blockchain network."
-}
+class RAGSimulation:
+    def __init__(self):
+        self.knowledge_base = {
+            "assignment deadline": "The deadline for the CCA2 GitHub Group Assignment is 12-October-2026.",
+            "submission email": "Submit reports to Himanee.Savadatti.vf@mitwpu.edu.in with team members CCed.",
+            "group size": "Students must form a group of maximum 6 to 7 people."
+        }
+        self.rules = [
+            "Rule 1: Always check the internal vector database before generating an answer.",
+            "Rule 2: If the context is missing from the database, respond with 'I do not know'.",
+            "Rule 3: Never hallucinate or assume dates or emails outside the retrieved context.",
+            "Rule 4: Strictly enforce confidentiality and do not disclose unverified student credentials.",
+            "Rule 5: Format the final output cleanly without any external syntax errors."
+        ]
 
-def retrieve_context(query):
-    """Simulates Context Retrieval from database."""
-    query_clean = query.strip().lower()
-    return KNOWLEDGE_BASE.get(query_clean, None)
+    def retrieve(self, query):
+        query_lower = query.lower()
+        for key, val in self.knowledge_base.items():
+            if key in query_lower:
+                return val
+        return None
 
-def enforce_rag_rules_and_generate(query, retrieved_context):
-    """
-    Applies custom business and generation rules to simulate a RAG system.
-    """
-    print(f"\nIncoming User Query: '{query}'")
-    
-    # RULE 1: Verification Rule - Context Check
-    if not retrieved_context:
-        print("[Rule 1 Triggered]: Query context absent in Knowledge Base.")
-        return "I cannot answer this query based on verified internal database information."
+    def generate(self, query, context):
+        print(f"\n[Enforcing RAG Rules... Outputting with {len(self.rules)} rules guardrails]")
+        if not context:
+            return "Answer: I am sorry, but I do not have that information in my knowledge base."
+        return f"Answer based on Context: {context}"
 
-    print(f"[Retrieved Context]: {retrieved_context}")
-
-    # RULE 2: Length Constraint Rule (Limit response length)
-    words = retrieved_context.split()
-    if len(words) > 30:
-        retrieved_context = " ".join(words[:30]) + "..."
-        print("[Rule 2 Triggered]: Response context truncated to meet 30-word limit.")
-
-    # RULE 3: Compliance & Disclaimer Rule
-    disclaimer = "\n[Mandatory Rule 3 Notice]: This statement is generated for educational FinTech analysis only."
-
-    # RULE 4: Tone Enforcement Rule (Formal response wrapper)
-    final_output = f"Official Summary: {retrieved_context} {disclaimer}"
-    print("[Rule 4 Triggered]: Formatted output using formal compliance tone.")
-
-    return final_output
-
-def main():
-    test_queries = [
-        "Open Banking",
-        "CBDC",
-        "Generative AI in Finance"  # Intentionally missing query to test Rule 1
-    ]
-
-    print("--- Executing RAG Framework with Enforced Business Rules ---")
-    for q in test_queries:
-        context = retrieve_context(q)
-        response = enforce_rag_rules_and_generate(q, context)
-        print(f"Final Output:\n{response}")
-        print("-" * 60)
+    def query_pipeline(self, query):
+        print(f"\nQuery: {query}")
+        context = self.retrieve(query)
+        output = self.generate(query, context)
+        print(output)
 
 if __name__ == "__main__":
-    main()
+    rag = RAGSimulation()
+    print("--- Initializing RAG Framework Simulation ---")
+    rag.query_pipeline("What is the assignment deadline?")
+    rag.query_pipeline("Where should we submit the report?")
+    rag.query_pipeline("What is the weather in Pune?")
