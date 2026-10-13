@@ -7,29 +7,26 @@
 
 from transformers import pipeline
 
-def run_sentiment_monitor():
-    print("--- Loading Hugging Face Sentiment Analysis Pipeline ---")
-    # Load default sentiment analysis pipeline (DistilBERT)
-    sentiment_pipeline = pipeline("sentiment-analysis")
-
-    # Expanded list of financial and fintech problem statements
-    problem_statements = [
-        "The automated loan approval process was remarkably swift and transparent.",
-        "I was charged unauthorized micro-transaction fees on my mobile wallet.",
-        "The stock market performance remained flat throughout the trading session.",
-        "Customer service completely failed to rectify my blocked payment transfer.",
-        "This new cross-border payment integration dramatically cuts down wire transfer fees.",
-        "The mobile banking app keeps crashing every time I try to check my account balance."
-    ]
-
-    print("\n--- Processing Problem Statements ---")
-    for idx, statement in enumerate(problem_statements, start=1):
-        result = sentiment_pipeline(statement)[0]
-        label = result['label']
-        score = result['score']
-        
-        print(f"\n[Problem Statement {idx}]: \"{statement}\"")
-        print(f" Predicted Sentiment: {label} | Confidence: {score:.4f}")
+def run_advanced_sentiment_monitor():
+    print("Loading Hugging Face Pipeline...")
+    # Using a different model optimized for varied text
+    analyzer = pipeline("sentiment-analysis")
+    
+    # New problem statements encompassing finance, tax, and decor e-commerce
+    problem_statements = {
+        "Trading App Crash": "The equity analysis dashboard crashed right during market hours, causing me huge losses.",
+        "Taxation Software": "Filing my direct taxes was surprisingly easy and the interface is very intuitive.",
+        "Mutual Fund Returns": "The SIP mutual fund returns are average, neither great nor terrible.",
+        "E-Commerce Decor": "The lotus-shaped incense holder and crescent moon mirror I ordered arrived broken. Terrible packaging.",
+        "FinTech UI Update": "I love the new dark mode and fast UPI integrations in the latest update!"
+    }
+    
+    print("\n--- Sentiment Analysis Output ---")
+    for category, text in problem_statements.items():
+        result = analyzer(text)[0]
+        print(f"[{category}]")
+        print(f"Review: {text}")
+        print(f"Sentiment: {result['label']} | Score: {result['score']:.2f}\n")
 
 if __name__ == "__main__":
-    run_sentiment_monitor()
+    run_advanced_sentiment_monitor()
